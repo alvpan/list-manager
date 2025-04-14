@@ -14,9 +14,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   };
 
   if (req.method === "GET") {
+
+    // Disabling caching (server side)
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+
     // Use the 'active subscribers' endpoint from CM to get all subs
-    const r = await fetch(`https://api.createsend.com/api/v3.3/lists/${LIST_ID}/active.json`, {
+    const r = await fetch(`https://api.createsend.com/api/v3.3/lists/${LIST_ID}/active.json`, 
+    {
       headers,
+      // Disabling cache so data updates dynamically
+      cache: "no-store",
     });
     const data = await r.json();
     return res.status(200).json(data);
@@ -29,13 +36,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const r = await fetch(baseURL, {
       method: "POST",
       headers,
-      // Send the actual creds to the server and not JS code
+      // Send the actual creds to the server (string format) and not JS code
       body: JSON.stringify({
         EmailAddress: email,
         Name: name,
-        // Enable credentials reusability
+        // User can be added again after deletion
         Resubscribe: true,
-        // Include else requests do not work
+        // Without this requests do not work
         ConsentToTrack: "Yes",
       }),
     });
@@ -43,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === "DELETE") {
-    // From query get the email and convert it to string
+    // Get the email from the query (in string format)
     const email = encodeURIComponent(req.query.email as string);
     const r = await fetch(`${baseURL}?email=${email}`, { method: "DELETE", headers });
     return res.status(r.status).end();
