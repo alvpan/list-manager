@@ -148,10 +148,8 @@ export default function Home() {
         {status}
       </div>
   
-      {/* Main content layout */}
       <div className="flex flex-row gap-6 justify-center items-start max-w-screen-xl mx-auto">
         
-        {/* Form Section (Left) */}
         <div className="flex flex-col gap-4 p-6 bg-white rounded-xl shadow-md w-[300px]">
           <input
             placeholder="Name"
@@ -173,25 +171,41 @@ export default function Home() {
           </button>
         </div>
   
-        {/* List Section (Right) */}
         <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-xl">
           <h2 className="text-lg font-semibold mb-4">Current Subscribers</h2>
-          <ul className="space-y-3">
-            {subscribers.map((s) => (
-              <li
-                key={s.EmailAddress}
-                className="flex justify-between items-center border-b pb-2"
-              >
-                <span>{s.Name} ({s.EmailAddress})</span>
-                <button
-                  onClick={() => deleteSubscriber(s.EmailAddress)}
-                  className="text-sm text-red-600 hover:underline"
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ backgroundColor: "#ff5733" }}>
+                <th style={{ textAlign: "left", padding: "10px", borderBottom: "2px solid #ddd" }}>Name</th>
+                <th style={{ textAlign: "left", padding: "10px", borderBottom: "2px solid #ddd" }}>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subscribers.map((s, idx) => (
+                <tr key={s.EmailAddress} style={{ backgroundColor: idx % 2 === 0 ? "#fff" : "#f9f9f9" }}>
+                  <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>{s.Name}</td>
+                  <td style={{ padding: "10px", borderBottom: "1px solid #eee" }}>
+                    {s.EmailAddress}{" "}
+                    <button
+                      onClick={() => deleteSubscriber(s.EmailAddress)}
+                      style={{
+                        marginLeft: "10px",
+                        backgroundColor: "#ff2412",
+                        color: "white",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "0.7rem",
+                        padding: "7px 12px",
+                        borderRadius: "20px",                        
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
