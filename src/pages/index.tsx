@@ -18,12 +18,13 @@ export default function Home() {
 
   const maxAttempts = 20;
 
-  const statusColorClass = (): string => {
-    if (status.includes("All data up to date")) return "text-green-600";
-    if (status.includes("Syncing")) return "text-blue-600";
-    if (status.includes("may still be syncing")) return "text-orange-500";
-    return "text-gray-600";
+  const statusColorStyle = (): React.CSSProperties => {
+    if (status.includes("All data up to date")) return { color: "#00a106" };
+    if (status.includes("Syncing")) return { color: "#387db2" };
+    if (status.includes("may still be syncing")) return { color: "orange" };
+    return { color: "gray" };
   };
+
 
   // First page load GETS all subs and UPDATES the UI
   const loadAndSetSubscribers = async () => {
@@ -49,7 +50,7 @@ export default function Home() {
 
     const poll = async () => {
       attemptRef.current++;
-      setStatus(`Syncing data in the background... You can keep using the service. Try ${attemptRef.current}/${maxAttempts}`);
+      setStatus(`Syncing... You can keep using the service. Try ${attemptRef.current}/${maxAttempts}`);
 
       const liveData = await loadSubscribers();
       const expected = expectedRef.current;
@@ -144,10 +145,6 @@ export default function Home() {
     <div className="min-h-screen p-6 bg-gray-100">
       <h1 className="text-2xl font-bold text-center mb-6">Mailing List</h1>
 
-      <div className={`text-sm mb-4 ${statusColorClass()}`}>
-        {status}
-      </div>
-
       <div
         style={{
           display: "flex",
@@ -187,7 +184,7 @@ export default function Home() {
           <button
             onClick={addSubscriber}
             style={{
-              backgroundColor: "green",
+              backgroundColor: "#40b238",
               color: "white",
               padding: "10px",
               border: "none",
@@ -210,61 +207,72 @@ export default function Home() {
             flex: 1,
           }}
         >
-          <h2 style={{ marginBottom: "16px", }}>Current Subscribers</h2>
-          
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "16px"
+          }}>
+            <h2 style={{ margin: 0 }}>Current Subscribers</h2>
+            <span style={{ fontStyle: "italic", fontWeight: "200", ...statusColorStyle() }}>
+  {status}
+</span>
+          </div>
+
+
           <div
-          style={{
-            borderRadius: "8px",
-            overflow: "hidden",
-            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-          }}
-        >
-          <table style={{ width: "100%", borderCollapse: "collapse", }}>
-            <thead>
-              <tr style={{ background: "linear-gradient(to bottom, #d5d5d5, #e1e1e1)"}}>
-                <th style={{ textAlign: "left", padding: "8px" }}>Name</th>
-                <th style={{ textAlign: "left", padding: "8px" }}>Email</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subscribers.map((s, index) => (
-                <tr
-                  key={s.EmailAddress}
-                  style={{
-                    backgroundColor: index % 2 === 0 ? "#ffffff" : "#f9f9f9",
-                  }}
-                >
-                  <td style={{ padding: "8px", }}>{s.Name}</td>
-                  <td style={{ padding: "8px" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span>{s.EmailAddress}</span>
-                      <button
-                        onClick={() => deleteSubscriber(s.EmailAddress)}
+            style={{
+              borderRadius: "8px",
+              overflow: "hidden",
+              boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+            }}
+          >
+            <table style={{ width: "100%", borderCollapse: "collapse", }}>
+              <thead>
+                <tr style={{ background: "linear-gradient(to bottom, #d5d5d5, #e1e1e1)" }}>
+                  <th style={{ textAlign: "left", padding: "8px" }}>Name</th>
+                  <th style={{ textAlign: "left", padding: "8px" }}>Email</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subscribers.map((s, index) => (
+                  <tr
+                    key={s.EmailAddress}
+                    style={{
+                      backgroundColor: index % 2 === 0 ? "#ffffff" : "#f9f9f9",
+                    }}
+                  >
+                    <td style={{ padding: "8px", }}>{s.Name}</td>
+                    <td style={{ padding: "8px" }}>
+                      <div
                         style={{
-                          padding: "6px 10px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          backgroundColor: "transparent",
-                          color: "red",
-                          border: "1px solid red",
-                          cursor: "pointer",
-                          marginLeft: "20px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
                         }}
                       >
-                        Remove
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        <span>{s.EmailAddress}</span>
+                        <button
+                          onClick={() => deleteSubscriber(s.EmailAddress)}
+                          style={{
+                            padding: "6px 10px",
+                            borderRadius: "6px",
+                            fontSize: "12px",
+                            backgroundColor: "transparent",
+                            color: "red",
+                            border: "1px solid red",
+                            cursor: "pointer",
+                            marginLeft: "20px",
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
         </div>
