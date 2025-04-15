@@ -88,7 +88,7 @@ export default function Home() {
       body: JSON.stringify({ name, email }),
     });
 
-    // Polling in background until API data matches UI data.
+    // Polling in background until API data matches UI data
     startPolling();
   };
 
@@ -97,14 +97,20 @@ export default function Home() {
     const optimisticList = subscribers.filter((s) => s.EmailAddress !== emailToRemove);
     setSubscribers(optimisticList);
     expectedRef.current = optimisticList;
-
-    await fetch(`/api/subscribers?email=${encodeURIComponent(emailToRemove)}`, {
+  
+    // Try to delete sub from the API list even if the sub is already deleted
+    const res = await fetch(`/api/subscribers?email=${encodeURIComponent(emailToRemove)}`, {
       method: "DELETE",
     });
-
-    // Poll (in background)  until data matches or max tries reached again
+  
+    if (!res.ok) {
+      setStatus(`Tried to remove ${emailToRemove}, but it may already be deleted.`);
+    }
+  
+    // Poll (in background) until data matches or max tries reached again
     startPolling();
   };
+  
 
   useEffect(() => {
     loadAndSetSubscribers();
