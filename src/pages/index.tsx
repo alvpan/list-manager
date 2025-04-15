@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 type Subscriber = {
   Name: string;
@@ -10,6 +10,10 @@ export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
+  // For Polling 
+  const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const expectedRef = useRef<Subscriber[]>([]);
+  const attemptRef = useRef(0);
 
   const getStatusColor = () => {
     if (status.includes("All data up to date")) return "green";
@@ -17,7 +21,7 @@ export default function Home() {
     if (status.includes("may still be syncing")) return "orange";
     return "#777";
   };
-  
+
   const loadAndSetSubscribers = async () => {
     const res = await fetch("/api/subscribers");
     const data = await res.json();
@@ -30,16 +34,19 @@ export default function Home() {
     return data.Results || [];
   };
 
-  const pollUntilSynced = async (expected: Subscriber[]) => {
-    setStatus("Syncing data in the background... You can keep using the app.");
+  const startPolling = () => {
+    if (pollingRef.current) {
+      clearTimeout(pollingRef.current);
+    }
 
-    let attempts = 0;
-    const maxAttempts = 10;
+    attemptRef.current = 0;
 
-    while (attempts < maxAttempts) {
-      // 12 seconds between each background refresh
-      await new Promise((resolve) => setTimeout(resolve, 12000));
+    const poll = async () => {
+      attemptRef.current++;
+      setStatus(`Syncing data in the background... You can keep using the service. Try ${attemptRef.current}/10`);
+
       const liveData = await loadSubscribers();
+      const expected = expectedRef.current;
 
       const allMatch = expected.every((s) =>
         liveData.find(
@@ -54,44 +61,49 @@ export default function Home() {
         return;
       }
 
-      attempts++;
-    }
+      if (attemptRef.current >= 10) {
+        setStatus("Some data may still be syncing... ");
+        return;
+      }
 
-    setStatus("Some data may still be syncing... ");
+      pollingRef.current = setTimeout(poll, 12000);
+    };
+
+    poll();
   };
 
   const addSubscriber = async () => {
     if (!name || !email) return;
-  
+
     const optimisticList = [...subscribers, { Name: name, EmailAddress: email }];
     setSubscribers(optimisticList);
-  
+    expectedRef.current = optimisticList;
+
     setName("");
     setEmail("");
-  
+
     await fetch("/api/subscribers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
-  
+
     // Polling in background until API data matches UI data.
-    pollUntilSynced(optimisticList);
+    startPolling();
   };
-  
 
   const deleteSubscriber = async (emailToRemove: string) => {
-
     // Remove now, sync later
     const optimisticList = subscribers.filter((s) => s.EmailAddress !== emailToRemove);
     setSubscribers(optimisticList);
+    expectedRef.current = optimisticList;
 
     await fetch(`/api/subscribers?email=${encodeURIComponent(emailToRemove)}`, {
       method: "DELETE",
     });
 
     // Poll (in background)  until data matches or max tries reached again
-    await pollUntilSynced(optimisticList);
+    startPolling();
   };
 
   useEffect(() => {
