@@ -63,25 +63,23 @@ export default function Home() {
 
   const addSubscriber = async () => {
     if (!name || !email) return;
-    setLoading(true);
-
-    // Optimistic UI. Add data now, sync data later
+  
     const optimisticList = [...subscribers, { Name: name, EmailAddress: email }];
     setSubscribers(optimisticList);
-
+  
+    setName("");
+    setEmail("");
+  
     await fetch("/api/subscribers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
-
-    setName("");
-    setEmail("");
-
-    // Poll until Campaign Monitor response matches new list or max tries reached
-    await pollUntilSynced(optimisticList);
-    setLoading(false);
+  
+    // Polling in background until API data matches UI data.
+    pollUntilSynced(optimisticList);
   };
+  
 
   const deleteSubscriber = async (emailToRemove: string) => {
     setLoading(true);
@@ -94,9 +92,8 @@ export default function Home() {
       method: "DELETE",
     });
 
-    // Poll until data matches or max tries reached again
+    // Poll (in background)  until data matches or max tries reached again
     await pollUntilSynced(optimisticList);
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -120,7 +117,7 @@ export default function Home() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <button onClick={addSubscriber} disabled={loading}>
+        <button onClick={addSubscriber}>
           Add
         </button>
       </div>
@@ -129,7 +126,7 @@ export default function Home() {
         {subscribers.map((s) => (
           <li key={s.EmailAddress} style={{ marginBottom: "0.5rem" }}>
             {s.Name} ({s.EmailAddress}){" "}
-            <button onClick={() => deleteSubscriber(s.EmailAddress)} disabled={loading}>
+            <button onClick={() => deleteSubscriber(s.EmailAddress)}>
               Remove
             </button>
           </li>
