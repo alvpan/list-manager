@@ -10,7 +10,8 @@ export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
-  // For Polling 
+
+  // For Polling
   const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const expectedRef = useRef<Subscriber[]>([]);
   const attemptRef = useRef(0);
@@ -22,18 +23,21 @@ export default function Home() {
     return "#777";
   };
 
+  // First page load GETS all subs and UPDATES the UI
   const loadAndSetSubscribers = async () => {
     const res = await fetch("/api/subscribers");
     const data = await res.json();
     setSubscribers(data.Results || []);
   };
 
+  // GETS subs but DOES NOT update the UI (used for comparing when polling)
   const loadSubscribers = async (): Promise<Subscriber[]> => {
     const res = await fetch("/api/subscribers");
     const data = await res.json();
     return data.Results || [];
   };
 
+  // Polling to check if UI subs list matches APIs GET subs list results (max 10 tries)
   const startPolling = () => {
     if (pollingRef.current) {
       clearTimeout(pollingRef.current);
@@ -75,7 +79,27 @@ export default function Home() {
   const addSubscriber = async () => {
     if (!name || !email) return;
 
-    const optimisticList = [...subscribers, { Name: name, EmailAddress: email }];
+    const existing = subscribers.find((s) => s.EmailAddress === email);
+
+    // Email and name already exist -> do nothing
+    if (existing && existing.Name === name) {
+      alert("Subscriber already exists.");
+      return;
+    }
+
+    // Same email, different name —> popup confirmation
+    if (existing && existing.Name !== name) {
+      const confirmReplace = window.confirm(
+        `This email already exists with a different name ("${existing.Name}"). Replace it with "${name}"?`
+      );
+      if (!confirmReplace) return;
+    }
+
+    // Update UI with new sub
+    const optimisticList = [
+      ...subscribers.filter((s) => s.EmailAddress !== email),
+      { Name: name, EmailAddress: email },
+    ];
     setSubscribers(optimisticList);
     expectedRef.current = optimisticList;
 
@@ -97,20 +121,20 @@ export default function Home() {
     const optimisticList = subscribers.filter((s) => s.EmailAddress !== emailToRemove);
     setSubscribers(optimisticList);
     expectedRef.current = optimisticList;
-  
+
     // Try to delete sub from the API list even if the sub is already deleted
     const res = await fetch(`/api/subscribers?email=${encodeURIComponent(emailToRemove)}`, {
       method: "DELETE",
     });
-  
+
+    // If sub is already deleted
     if (!res.ok) {
       setStatus(`Tried to remove ${emailToRemove}, but it may already be deleted.`);
     }
-  
+
     // Poll (in background) until data matches or max tries reached again
     startPolling();
   };
-  
 
   useEffect(() => {
     loadAndSetSubscribers();
