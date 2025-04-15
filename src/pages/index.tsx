@@ -176,20 +176,20 @@ export default function Home() {
             placeholder="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{ padding: "8px" }}
+            style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
           />
           <input
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={{ padding: "8px" }}
+            style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
           />
           <button
             onClick={addSubscriber}
             style={{
               backgroundColor: "green",
               color: "white",
-              padding: "8px",
+              padding: "10px",
               border: "none",
               borderRadius: "6px",
               cursor: "pointer",
@@ -210,10 +210,18 @@ export default function Home() {
             flex: 1,
           }}
         >
-          <h2 style={{ marginBottom: "16px" }}>Current Subscribers</h2>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <h2 style={{ marginBottom: "16px", }}>Current Subscribers</h2>
+          
+          <div
+          style={{
+            borderRadius: "8px",
+            overflow: "hidden",
+            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+          }}
+        >
+          <table style={{ width: "100%", borderCollapse: "collapse", }}>
             <thead>
-              <tr style={{ backgroundColor: "#f0f0f0" }}>
+              <tr style={{ background: "linear-gradient(to bottom, #d5d5d5, #e1e1e1)"}}>
                 <th style={{ textAlign: "left", padding: "8px" }}>Name</th>
                 <th style={{ textAlign: "left", padding: "8px" }}>Email</th>
               </tr>
@@ -226,7 +234,7 @@ export default function Home() {
                     backgroundColor: index % 2 === 0 ? "#ffffff" : "#f9f9f9",
                   }}
                 >
-                  <td style={{ padding: "8px" }}>{s.Name}</td>
+                  <td style={{ padding: "8px", }}>{s.Name}</td>
                   <td style={{ padding: "8px" }}>
                     <div
                       style={{
@@ -257,6 +265,8 @@ export default function Home() {
               ))}
             </tbody>
           </table>
+          </div>
+
         </div>
       </div>
     </div>
