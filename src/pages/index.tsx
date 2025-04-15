@@ -9,7 +9,6 @@ export default function Home() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
   const getStatusColor = () => {
@@ -82,7 +81,6 @@ export default function Home() {
   
 
   const deleteSubscriber = async (emailToRemove: string) => {
-    setLoading(true);
 
     // Remove now, sync later
     const optimisticList = subscribers.filter((s) => s.EmailAddress !== emailToRemove);
