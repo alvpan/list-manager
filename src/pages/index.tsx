@@ -16,11 +16,13 @@ export default function Home() {
   const expectedRef = useRef<Subscriber[]>([]);
   const attemptRef = useRef(0);
 
-  const getStatusColor = () => {
-    if (status.includes("All data up to date")) return "green";
-    if (status.includes("Syncing")) return "blue";
-    if (status.includes("may still be syncing")) return "orange";
-    return "#777";
+  const maxAttempts = 20;
+
+  const statusColorClass = (): string => {
+    if (status.includes("All data up to date")) return "text-green-600";
+    if (status.includes("Syncing")) return "text-blue-600";
+    if (status.includes("may still be syncing")) return "text-orange-500";
+    return "text-gray-600";
   };
 
   // First page load GETS all subs and UPDATES the UI
@@ -37,7 +39,7 @@ export default function Home() {
     return data.Results || [];
   };
 
-  // Polling to check if UI subs list matches APIs GET subs list results (max 10 tries)
+  // Polling to check if UI subs list matches APIs GET subs list results (max attempts)
   const startPolling = () => {
     if (pollingRef.current) {
       clearTimeout(pollingRef.current);
@@ -47,7 +49,7 @@ export default function Home() {
 
     const poll = async () => {
       attemptRef.current++;
-      setStatus(`Syncing data in the background... You can keep using the service. Try ${attemptRef.current}/10`);
+      setStatus(`Syncing data in the background... You can keep using the service. Try ${attemptRef.current}/${maxAttempts}`);
 
       const liveData = await loadSubscribers();
       const expected = expectedRef.current;
@@ -65,7 +67,7 @@ export default function Home() {
         return;
       }
 
-      if (attemptRef.current >= 10) {
+      if (attemptRef.current >= maxAttempts) {
         setStatus("Some data may still be syncing... ");
         return;
       }
@@ -112,7 +114,6 @@ export default function Home() {
       body: JSON.stringify({ name, email }),
     });
 
-    // Polling in background until API data matches UI data
     startPolling();
   };
 
@@ -132,7 +133,6 @@ export default function Home() {
       setStatus(`Tried to remove ${emailToRemove}, but it may already be deleted.`);
     }
 
-    // Poll (in background) until data matches or max tries reached again
     startPolling();
   };
 
@@ -141,37 +141,59 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "600px", margin: "auto" }}>
-      <h1>Mailing List</h1>
-
-      <div style={{ margin: "1rem 0", color: getStatusColor() }}>{status}</div>
-
-      <div style={{ marginBottom: "2rem", display: "flex", flexDirection: "column", gap: "10px" }}>
-        <input
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <button onClick={addSubscriber}>
-          Add
-        </button>
+    <div className="min-h-screen p-6 bg-gray-100">
+      <h1 className="text-2xl font-bold text-center mb-6">Mailing List</h1>
+  
+      <div className={`text-sm mb-4 ${statusColorClass()}`}>
+        {status}
       </div>
-
-      <ul>
-        {subscribers.map((s) => (
-          <li key={s.EmailAddress} style={{ marginBottom: "0.5rem" }}>
-            {s.Name} ({s.EmailAddress}){" "}
-            <button onClick={() => deleteSubscriber(s.EmailAddress)}>
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
+  
+      {/* Main content layout */}
+      <div className="flex flex-row gap-6 justify-center items-start max-w-screen-xl mx-auto">
+        
+        {/* Form Section (Left) */}
+        <div className="flex flex-col gap-4 p-6 bg-white rounded-xl shadow-md w-[300px]">
+          <input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="border border-gray-300 p-2 rounded"
+          />
+          <input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="border border-gray-300 p-2 rounded"
+          />
+          <button
+            onClick={addSubscriber}
+            className="bg-green-500 text-white py-2 rounded hover:bg-green-600 transition"
+          >
+            Add
+          </button>
+        </div>
+  
+        {/* List Section (Right) */}
+        <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-xl">
+          <h2 className="text-lg font-semibold mb-4">Current Subscribers</h2>
+          <ul className="space-y-3">
+            {subscribers.map((s) => (
+              <li
+                key={s.EmailAddress}
+                className="flex justify-between items-center border-b pb-2"
+              >
+                <span>{s.Name} ({s.EmailAddress})</span>
+                <button
+                  onClick={() => deleteSubscriber(s.EmailAddress)}
+                  className="text-sm text-red-600 hover:underline"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
-  );
+  );    
 }
