@@ -142,141 +142,146 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100">
-      <h1 className="text-2xl font-bold text-center mb-6">Mailing List</h1>
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          gap: "40px",
-          padding: "40px",
-          flexWrap: "wrap",
-        }}
-      >
-        {/* Left: Form */}
+    <div style={{ maxWidth: "1000px", width: "100%", margin: "0 auto"}}>
+
+      <div className="min-h-screen p-6 bg-gray-900 flex flex-col items-center">
+        <h1 className="text-2xl font-bold text-center mb-6 ">Mailing List</h1>
+
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            padding: "20px",
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-            minWidth: "250px",
+            flexDirection: "row",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            gap: "40px",
+            padding: "40px",
+            flexWrap: "wrap",
           }}
         >
-          <input
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
-          />
-          <input
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
-          />
-          <button
-            onClick={addSubscriber}
-            style={{
-              backgroundColor: "#40b238",
-              color: "white",
-              padding: "10px",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-          >
-            Add
-          </button>
-        </div>
-
-        {/* Right: Table */}
-        <div
-          style={{
-            backgroundColor: "#fff",
-            padding: "20px",
-            borderRadius: "8px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-            flex: 1,
-          }}
-        >
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "16px"
-          }}>
-            <h2 style={{ margin: 0 }}>Current Subscribers</h2>
-            <span style={{ fontStyle: "italic", fontWeight: "200", ...statusColorStyle() }}>
-  {status}
-</span>
-          </div>
-
-
+          {/* Left: Form */}
           <div
             style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              padding: "20px",
+              backgroundColor: "#fff",
               borderRadius: "8px",
-              overflow: "hidden",
               boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+              minWidth: "250px",
             }}
           >
-            <table style={{ width: "100%", borderCollapse: "collapse", }}>
-              <thead>
-                <tr style={{ background: "linear-gradient(to bottom, #d5d5d5, #e1e1e1)" }}>
-                  <th style={{ textAlign: "left", padding: "8px" }}>Name</th>
-                  <th style={{ textAlign: "left", padding: "8px" }}>Email</th>
-                </tr>
-              </thead>
-              <tbody>
-                {subscribers.map((s, index) => (
-                  <tr
-                    key={s.EmailAddress}
-                    style={{
-                      backgroundColor: index % 2 === 0 ? "#ffffff" : "#f9f9f9",
-                    }}
-                  >
-                    <td style={{ padding: "8px", }}>{s.Name}</td>
-                    <td style={{ padding: "8px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <span>{s.EmailAddress}</span>
-                        <button
-                          onClick={() => deleteSubscriber(s.EmailAddress)}
-                          style={{
-                            padding: "6px 10px",
-                            borderRadius: "6px",
-                            fontSize: "12px",
-                            backgroundColor: "transparent",
-                            color: "red",
-                            border: "1px solid red",
-                            cursor: "pointer",
-                            marginLeft: "20px",
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <input
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
+            />
+            <input
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
+            />
+            <button
+              onClick={addSubscriber}
+              style={{
+                backgroundColor: "#40b238",
+                color: "white",
+                padding: "10px",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              Add
+            </button>
           </div>
 
+          {/* Right: Table */}
+          <div
+            style={{
+              backgroundColor: "#fff",
+              padding: "20px",
+              borderRadius: "8px",
+              boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+              flex: 1,
+            }}
+          >
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "16px"
+            }}>
+              <h2 style={{ margin: 0 }}>Current Subscribers</h2>
+              <span style={{ fontStyle: "italic", fontWeight: "200", ...statusColorStyle() }}>
+                {status}
+              </span>
+            </div>
+
+
+            <div
+              style={{
+                borderRadius: "8px",
+                overflow: "hidden",
+                boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+              }}
+            >
+              <table style={{ width: "100%", borderCollapse: "collapse", }}>
+                <thead>
+                  <tr style={{ background: "linear-gradient(to bottom, #d5d5d5, #e1e1e1)" }}>
+                    <th style={{ textAlign: "left", padding: "8px" }}>Name</th>
+                    <th style={{ textAlign: "left", padding: "8px" }}>Email</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subscribers.map((s, index) => (
+                    <tr
+                      key={s.EmailAddress}
+                      style={{
+                        backgroundColor: index % 2 === 0 ? "#ffffff" : "#f9f9f9",
+                      }}
+                    >
+                      <td style={{ padding: "8px", }}>{s.Name}</td>
+                      <td style={{ padding: "8px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <span>{s.EmailAddress}</span>
+                          <button
+                            onClick={() => deleteSubscriber(s.EmailAddress)}
+                            style={{
+                              padding: "6px 10px",
+                              borderRadius: "6px",
+                              fontSize: "12px",
+                              backgroundColor: "transparent",
+                              color: "red",
+                              border: "1px solid red",
+                              cursor: "pointer",
+                              marginLeft: "20px",
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
         </div>
       </div>
+
     </div>
   );
 }
