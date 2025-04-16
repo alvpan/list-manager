@@ -172,7 +172,7 @@ export default function Home() {
               opacity: 0.4,            
             }}
           >
-            Margera's Mailing List
+            Margera&apos;s Mailing List
           </h1>
 
           <div
