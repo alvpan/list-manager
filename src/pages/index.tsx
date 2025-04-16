@@ -80,28 +80,52 @@ export default function Home() {
   };
 
   const addSubscriber = async () => {
-    if (!name || !email) return;
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
 
-    const existing = subscribers.find((s) => s.EmailAddress === email);
+    // Basic validation
+    if (!trimmedName || !trimmedEmail) {
+      alert("Both name and email are required.");
+      return;
+    }
 
-    // Email and name already exist -> do nothing
-    if (existing && existing.Name === name) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    const nameRegex = /^[a-zA-Z\s'-]+$/;
+    if (!nameRegex.test(trimmedName)) {
+      alert("Name can only contain letters, spaces, hyphens (-), and apostrophes (').");
+      return;
+    }
+
+    if (trimmedName.length > 50) {
+      alert("Name is too long (max 50 characters).");
+      return;
+    }
+
+    const existing = subscribers.find((s) => s.EmailAddress === trimmedEmail);
+
+    // Email and name already exist → do nothing
+    if (existing && existing.Name === trimmedName) {
       alert("Subscriber already exists.");
       return;
     }
 
-    // Same email, different name —> popup confirmation
-    if (existing && existing.Name !== name) {
+    // Same email, different name → confirm replace
+    if (existing && existing.Name !== trimmedName) {
       const confirmReplace = window.confirm(
-        `This email already exists with a different name ("${existing.Name}"). Replace it with "${name}"?`
+        `This email already exists with a different name ("${existing.Name}"). Replace it with "${trimmedName}"?`
       );
       if (!confirmReplace) return;
     }
 
     // Update UI with new sub
     const optimisticList = [
-      ...subscribers.filter((s) => s.EmailAddress !== email),
-      { Name: name, EmailAddress: email },
+      ...subscribers.filter((s) => s.EmailAddress !== trimmedEmail),
+      { Name: trimmedName, EmailAddress: trimmedEmail },
     ];
     setSubscribers(optimisticList);
     expectedRef.current = optimisticList;
@@ -112,11 +136,12 @@ export default function Home() {
     await fetch("/api/subscribers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email }),
+      body: JSON.stringify({ name: trimmedName, email: trimmedEmail }),
     });
 
     startPolling();
   };
+
 
   const deleteSubscriber = async (emailToRemove: string) => {
     // Remove now, sync later
@@ -169,7 +194,7 @@ export default function Home() {
               color: "#303030",
               marginTop: "0px",
               paddingTop: "40px",
-              opacity: 0.4,            
+              opacity: 0.4,
             }}
           >
             Margera&apos;s Mailing List
