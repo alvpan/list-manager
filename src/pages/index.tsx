@@ -143,10 +143,20 @@ export default function Home() {
 
   return (
 
-    <div style={{ maxWidth: "1000px", width: "100%", margin: "0 auto"}}>
+    <div style={{ maxWidth: "1500px", width: "100%", margin: "0 auto" }}>
 
-      <div className="min-h-screen p-6 bg-gray-900 flex flex-col items-center">
-        <h1 className="text-2xl font-bold text-center mb-6 ">Mailing List</h1>
+      <div>
+        <h1
+          style={{
+            textAlign: "center",
+            width: "100%",
+            fontSize: "24px",
+            fontWeight: "bold",
+            marginTop: "30px",
+          }}
+        >
+          Mailing List
+        </h1>
 
         <div
           style={{
