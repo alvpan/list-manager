@@ -269,6 +269,7 @@ export default function Home() {
                 flex: 1,
               }}
             >
+              {/* Table Title and Info Message Bar */}
               <div style={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -281,7 +282,7 @@ export default function Home() {
                 </span>
               </div>
 
-
+              {/* Table Box */}
               <div
                 style={{
                   borderRadius: "8px",
@@ -305,6 +306,7 @@ export default function Home() {
                         }}
                       >
                         <td style={{ padding: "8px", }}>{s.Name}</td>
+                        
                         <td style={{ padding: "8px" }}>
                           <div
                             style={{
