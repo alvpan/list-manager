@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState, useRef } from "react";
 
 type Subscriber = {
@@ -124,9 +125,12 @@ export default function Home() {
 
     // Update UI with new sub
     const optimisticList = [
+      // Copy subs to new array (...) (after deleting the email match)
       ...subscribers.filter((s) => s.EmailAddress !== trimmedEmail),
+      // Add new sub
       { Name: trimmedName, EmailAddress: trimmedEmail },
     ];
+
     setSubscribers(optimisticList);
     expectedRef.current = optimisticList;
 
@@ -162,6 +166,8 @@ export default function Home() {
     startPolling();
   };
 
+
+  // When the page first loads
   useEffect(() => {
     loadAndSetSubscribers();
   }, []);
@@ -174,7 +180,7 @@ export default function Home() {
   }, []);
 
   return (
-
+    //BG
     <div
       style={{
         background: "linear-gradient(135deg, #f7f7f7, #ffffff)",
@@ -182,7 +188,7 @@ export default function Home() {
       }}
     >
 
-
+      {/* Main Container */}
       <div style={{ maxWidth: "1500px", width: "100%", margin: "0 auto" }}>
 
         <div>
@@ -199,7 +205,8 @@ export default function Home() {
           >
             Margera&apos;s Mailing List
           </h1>
-
+          
+          {/* 2 Box Container */}
           <div
             style={{
               display: "flex",
@@ -252,7 +259,7 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Right: Table */}
+            {/* Right: Table Box*/}
             <div
               style={{
                 backgroundColor: "#fff",
