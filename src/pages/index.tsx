@@ -181,14 +181,11 @@ export default function Home() {
 
   // Google Analytics
   useEffect(() => {
-
-    // Load gtag library
     const script1 = document.createElement("script");
     script1.src = `https://www.googletagmanager.com/gtag/js?id=G-SC4R1WN19F`;
     script1.async = true;
     document.head.appendChild(script1);
-
-    // Initialize Analytics
+  
     const script2 = document.createElement("script");
     script2.innerHTML = `
       window.dataLayer = window.dataLayer || [];
