@@ -1,12 +1,17 @@
-import Head from "next/head";
+import type { AppProps } from "next/app";
 import Script from "next/script";
 import { useEffect } from "react";
-import type { AppProps } from "next/app";
+
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag('event', 'page_view', {
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag('event', 'page_view', {
         page_path: window.location.pathname,
       });
     }
@@ -14,13 +19,6 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
-
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-SC4R1WN19F"
         strategy="afterInteractive"
@@ -43,9 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       />
 
-      <div style={{ fontFamily: "'Inter', sans-serif" }}>
-        <Component {...pageProps} />
-      </div>
+      <Component {...pageProps} />
     </>
   );
 }
