@@ -179,22 +179,6 @@ export default function Home() {
     document.documentElement.style.padding = "0";
   }, []);
 
-  // Google Analytics
-  useEffect(() => {
-    const script1 = document.createElement("script");
-    script1.src = `https://www.googletagmanager.com/gtag/js?id=G-SC4R1WN19F`;
-    script1.async = true;
-    document.head.appendChild(script1);
-  
-    const script2 = document.createElement("script");
-    script2.innerHTML = `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-SC4R1WN19F', { send_page_view: true, debug_mode: true });
-    `;
-    document.head.appendChild(script2);
-  }, []);
 
   return (
     //BG
