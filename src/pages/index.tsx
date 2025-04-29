@@ -188,6 +188,25 @@ export default function Home() {
 
 
   const deleteSubscriber = async (emailToRemove: string) => {
+
+    // GA helpers
+    // Check row position before deleting it
+    const totalSubs = subscribers.length;
+    const index = subscribers.findIndex(
+      (s) => s.EmailAddress === emailToRemove
+    );
+
+    const position = `${index + 1}/${totalSubs}`;
+    const emailType = classifyEmail(emailToRemove);
+
+    // Send event to GA
+    if (window.gtag) {
+      window.gtag('event', 'click_remove_subscriber', {
+        position: position,
+        d_email_type: emailType,
+      });
+    }
+
     // Remove now, sync later
     const optimisticList = subscribers.filter((s) => s.EmailAddress !== emailToRemove);
     setSubscribers(optimisticList);
