@@ -35,6 +35,16 @@ export default function Home() {
 
   const maxAttempts = 20;
 
+  // Helper for GA error tracking
+  function trackApiError(message: string, action: 'add' | 'remove') {
+    if (window.gtag) {
+      window.gtag('event', 'cm_error', {
+        error_response: message,
+        action,
+      });
+    }
+  }  
+
   const statusColorStyle = (): React.CSSProperties => {
     if (status.includes("All data up to date")) return { color: "#00a106" };
     if (status.includes("Syncing")) return { color: "#387db2" };
@@ -161,12 +171,22 @@ export default function Home() {
     setName("");
     setEmail("");
 
-    await fetch("/api/subscribers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: trimmedName, email: trimmedEmail }),
-    });
-
+    // POST with GA error response tracker
+    try {
+      const res = await fetch("/api/subscribers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmedName, email: trimmedEmail }),
+      });
+    
+      if (!res.ok) {
+        const text = await res.text();
+        trackApiError(text || `HTTP ${res.status}`, "add");
+      }
+    } catch (err) {
+      trackApiError((err as Error).message, "add");
+    }
+   
     // GA event tracker
     if (window.gtag) {
       const timeToClick = typingStartRef.current
@@ -190,7 +210,7 @@ export default function Home() {
   const deleteSubscriber = async (emailToRemove: string) => {
 
     // GA helpers
-    // Check row position before deleting it
+    // Get row position before deleting it
     const totalSubs = subscribers.length;
     const index = subscribers.findIndex(
       (s) => s.EmailAddress === emailToRemove
@@ -203,7 +223,7 @@ export default function Home() {
     if (window.gtag) {
       window.gtag('event', 'click_remove_subscriber', {
         position: position,
-        d_email_type: emailType,
+        email_type: emailType,
       });
     }
 
@@ -212,15 +232,21 @@ export default function Home() {
     setSubscribers(optimisticList);
     expectedRef.current = optimisticList;
 
-    // Try to delete sub from the API list even if the sub is already deleted
-    const res = await fetch(`/api/subscribers?email=${encodeURIComponent(emailToRemove)}`, {
-      method: "DELETE",
-    });
-
-    // If sub is already deleted
-    if (!res.ok) {
-      setStatus(`Tried to remove ${emailToRemove}, but it may already be deleted.`);
-    }
+    // DELETE with GA error response tracker
+    try {
+      const res = await fetch(`/api/subscribers?email=${encodeURIComponent(emailToRemove)}`, {
+        method: "DELETE",
+      });
+    
+      if (!res.ok) {
+        const text = await res.text();
+        setStatus(`Tried to remove ${emailToRemove}, but it may already be deleted.`);
+        trackApiError(text || `HTTP ${res.status}`, "remove");
+      }
+    } catch (err) {
+      setStatus(`Error while removing: ${(err as Error).message}`);
+      trackApiError((err as Error).message, "remove");
+    }    
 
     startPolling();
   };
