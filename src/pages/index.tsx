@@ -173,7 +173,7 @@ export default function Home() {
         ? (performance.now() - typingStartRef.current) / 1000
         : null;
     
-      window.gtag('event', 'add_subscriber_click', {
+      window.gtag('event', 'click_add_subscriber', {
         time_needed: timeToClick,
         email_type: classifyEmail(trimmedEmail),
         error: fieldErrorRef.current
