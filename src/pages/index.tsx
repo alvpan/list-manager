@@ -233,20 +233,23 @@ export default function Home() {
     expectedRef.current = optimisticList;
 
     // DELETE with GA error response tracker
+    let res;
     try {
-      const res = await fetch(`/api/subscribers?email=${encodeURIComponent(emailToRemove)}`, {
+      res = await fetch(`/api/subscribers?email=${encodeURIComponent(emailToRemove)}`, {
         method: "DELETE",
       });
-    
-      if (!res.ok) {
-        const text = await res.text();
-        setStatus(`Tried to remove ${emailToRemove}, but it may already be deleted.`);
-        trackApiError(text || `HTTP ${res.status}`, "remove");
-      }
     } catch (err) {
       setStatus(`Error while removing: ${(err as Error).message}`);
       trackApiError((err as Error).message, "remove");
-    }    
+      return;
+    }
+
+    if (!res.ok) {
+      const text = await res.text();
+      setStatus(`Tried to remove ${emailToRemove}, but it may already be deleted.`);
+      trackApiError(text || `HTTP ${res.status}`, "remove");
+    }
+    
 
     startPolling();
   };
