@@ -26,7 +26,7 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <Script
-        id="ga4-init"
+        id="ga-init"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
@@ -36,12 +36,12 @@ export default function App({ Component, pageProps }: AppProps) {
             gtag('js', new Date());
             gtag('config', 'G-SC4R1WN19F', {
               send_page_view: false,
-              debug_mode: true,
-              cookie_flags: 'SameSite=None;Secure'
+              debug_mode: true
             });
           `,
         }}
       />
+
 
       <Component {...pageProps} />
     </>
