@@ -36,7 +36,8 @@ export default function App({ Component, pageProps }: AppProps) {
             gtag('js', new Date());
             gtag('config', 'G-SC4R1WN19F', {
               send_page_view: false,
-              debug_mode: true
+              debug_mode: true,
+              cookie_flags: 'SameSite=None;Secure'
             });
           `,
         }}

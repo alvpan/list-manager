@@ -1,6 +1,18 @@
 import React from "react";
 import { useEffect, useState, useRef } from "react";
 
+// Mail category checker
+const GENERIC_DOMAINS = [
+  'gmail.com', 'outlook.com', 'hotmail.com',
+  'yahoo.com', 'icloud.com', 'protonmail.com',
+  'aol.com',
+];
+
+function classifyEmail(address: string) {
+  const domain = address.split('@')[1]?.toLowerCase() || '';
+  return GENERIC_DOMAINS.includes(domain) ? 'generic' : 'work/personal';
+}
+
 type Subscriber = {
   Name: string;
   EmailAddress: string;
@@ -11,6 +23,10 @@ export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
+
+  // GA trackers
+  const typingStartRef = useRef<number | null>(null);
+  const fieldErrorRef  = useRef<boolean>(false)
 
   // For Polling
   const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -87,23 +103,27 @@ export default function Home() {
     // Basic validation
     if (!trimmedName || !trimmedEmail) {
       alert("Both name and email are required.");
+      fieldErrorRef.current = true;
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(trimmedEmail)) {
       alert("Please enter a valid email address.");
+      fieldErrorRef.current = true;
       return;
     }
 
     const nameRegex = /^[a-zA-Z\s'-]+$/;
     if (!nameRegex.test(trimmedName)) {
       alert("Name can only contain letters, spaces, hyphens (-), and apostrophes (').");
+      fieldErrorRef.current = true;
       return;
     }
 
     if (trimmedName.length > 50) {
       alert("Name is too long (max 50 characters).");
+      fieldErrorRef.current = true;
       return;
     }
 
@@ -112,6 +132,7 @@ export default function Home() {
     // Email and name already exist → do nothing
     if (existing && existing.Name === trimmedName) {
       alert("Subscriber already exists.");
+      fieldErrorRef.current = true;
       return;
     }
 
@@ -120,7 +141,10 @@ export default function Home() {
       const confirmReplace = window.confirm(
         `This email already exists with a different name ("${existing.Name}"). Replace it with "${trimmedName}"?`
       );
-      if (!confirmReplace) return;
+      if (!confirmReplace) {
+        fieldErrorRef.current = true;
+        return;
+      }
     }
 
     // Update UI with new sub
@@ -142,6 +166,22 @@ export default function Home() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: trimmedName, email: trimmedEmail }),
     });
+
+    // GA event tracker
+    if (window.gtag) {
+      const timeToClick = typingStartRef.current
+        ? (performance.now() - typingStartRef.current) / 1000
+        : null;
+    
+      window.gtag('event', 'add_subscriber_click', {
+        time_needed: timeToClick,
+        email_type: classifyEmail(trimmedEmail),
+        error: fieldErrorRef.current
+      });
+    }
+    // Reset
+    typingStartRef.current = null;
+    fieldErrorRef.current  = false;
 
     startPolling();
   };
@@ -179,6 +219,13 @@ export default function Home() {
     document.documentElement.style.padding = "0";
   }, []);
 
+  useEffect(() => {
+    if (window.gtag) {
+      window.gtag('set', 'user_properties', {
+        subscriber_count: subscribers.length,
+      });
+    }
+  }, [subscribers.length]); // Call when the list length changes
 
   return (
     //BG
@@ -235,13 +282,19 @@ export default function Home() {
               <input
                 placeholder="Name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  if (typingStartRef.current === null) typingStartRef.current = performance.now();
+                  setName(e.target.value);
+                }}
                 style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
               />
               <input
                 placeholder="Email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  if (typingStartRef.current === null) typingStartRef.current = performance.now();
+                  setEmail(e.target.value);
+                }}
                 style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
               />
               <button
