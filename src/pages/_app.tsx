@@ -1,16 +1,17 @@
-import type { AppProps } from "next/app";
-import Script from "next/script";
-import { useEffect } from "react";
+import type { AppProps } from 'next/app';
+import Script from 'next/script';
+import { useEffect } from 'react';
 
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void;
+    gtag: (...args: unknown[]) => void;
+    dataLayer: unknown[];
   }
 }
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    if (typeof window !== "undefined" && window.gtag) {
+    if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'page_view', {
         page_path: window.location.pathname,
       });
