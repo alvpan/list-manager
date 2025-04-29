@@ -239,13 +239,6 @@ export default function Home() {
     setSubscribers(optimisticList);
     expectedRef.current = optimisticList;
 
-    // Counter here to count AFTER button click
-    if (window.gtag) {
-      window.gtag('set', 'user_properties', {
-        subscriber_count: optimisticList.length,
-      });
-    } 
-
     // DELETE with GA error response tracker
     let res;
     try {
@@ -262,8 +255,15 @@ export default function Home() {
       const text = await res.text();
       setStatus(`Tried to remove ${emailToRemove}, but it may already be deleted.`);
       trackApiError(text || `HTTP ${res.status}`, "remove");
+      return;
     }
     
+    // Counter here to count AFTER button click
+    if (window.gtag) {
+      window.gtag('set', 'user_properties', {
+        subscriber_count: optimisticList.length,
+      });
+    }
 
     startPolling();
   };
