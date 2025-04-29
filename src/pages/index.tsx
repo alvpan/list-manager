@@ -191,7 +191,7 @@ export default function Home() {
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-SC4R1WN19F', { send_page_view: true });
+      gtag('config', 'G-SC4R1WN19F', { send_page_view: true, debug_mode: true });
     `;
     document.head.appendChild(script2);
   }, []);
