@@ -166,14 +166,7 @@ export default function Home() {
     ];
 
     setSubscribers(optimisticList);
-    expectedRef.current = optimisticList;
-
-    // Counter here to count AFTER button click
-    if (window.gtag) {
-      window.gtag('set', 'user_properties', {
-        subscriber_count: optimisticList.length,
-      });
-    }    
+    expectedRef.current = optimisticList;  
 
     setName("");
     setEmail("");
@@ -257,13 +250,6 @@ export default function Home() {
       trackApiError(text || `HTTP ${res.status}`, "remove");
       return;
     }
-    
-    // Counter here to count AFTER button click
-    if (window.gtag) {
-      window.gtag('set', 'user_properties', {
-        subscriber_count: optimisticList.length,
-      });
-    }
 
     startPolling();
   };
@@ -281,13 +267,13 @@ export default function Home() {
     document.documentElement.style.padding = "0";
   }, []);
 
-  // useEffect(() => {
-  //   if (window.gtag) {
-  //     window.gtag('set', 'user_properties', {
-  //       subscriber_count: subscribers.length,
-  //     });
-  //   }
-  // }, [subscribers.length]); // Call when the list length changes
+  useEffect(() => {
+    if (window.gtag) {
+      window.gtag('set', 'user_properties', {
+        subscriber_count: subscribers.length,
+      });
+    }
+  }, [subscribers.length]); // Call when the list length changes ( gets ALSO called on first page load [not correct behaviour])
 
   return (
     //BG
