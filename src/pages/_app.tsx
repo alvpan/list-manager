@@ -1,8 +1,17 @@
 import Head from "next/head";
 import Script from "next/script";
+import { useEffect } from "react";
 import type { AppProps } from "next/app";
 
 export default function App({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag('event', 'page_view', {
+        page_path: window.location.pathname,
+      });
+    }
+  }, []);
+
   return (
     <>
       <Head>
@@ -24,9 +33,10 @@ export default function App({ Component, pageProps }: AppProps) {
           __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
             gtag('js', new Date());
             gtag('config', 'G-SC4R1WN19F', {
-              send_page_view: true,
+              send_page_view: false,
               debug_mode: true
             });
           `,
