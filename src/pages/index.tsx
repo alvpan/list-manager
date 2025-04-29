@@ -28,6 +28,10 @@ export default function Home() {
   const typingStartRef = useRef<number | null>(null);
   const fieldErrorRef  = useRef<boolean>(false)
 
+  // For Typing Abortion check
+  const hasStartedTypingRef = useRef<boolean>(false);
+  const formSubmittedRef = useRef<boolean>(false);
+
   // For Polling
   const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const expectedRef = useRef<Subscriber[]>([]);
@@ -166,7 +170,9 @@ export default function Home() {
     ];
 
     setSubscribers(optimisticList);
-    expectedRef.current = optimisticList;  
+    expectedRef.current = optimisticList;
+
+    formSubmittedRef.current = true;
 
     setName("");
     setEmail("");
@@ -267,6 +273,28 @@ export default function Home() {
     document.documentElement.style.padding = "0";
   }, []);
 
+  // Send GA error log (typing time) if user Typed but did not Add
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (hasStartedTypingRef.current && !formSubmittedRef.current) {
+        if (window.gtag) {
+          window.gtag('event', 'form_abandonment', {
+            time_spent_typing: typingStartRef.current
+              ? (performance.now() - typingStartRef.current) / 1000
+              : null,
+          });
+        }
+      }
+    };
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+  
+
   useEffect(() => {
     if (window.gtag) {
       window.gtag('set', 'user_properties', {
@@ -332,8 +360,9 @@ export default function Home() {
                 value={name}
                 onChange={(e) => {
                   if (typingStartRef.current === null) typingStartRef.current = performance.now();
+                  if (!hasStartedTypingRef.current) hasStartedTypingRef.current = true;
                   setName(e.target.value);
-                }}
+                }}                
                 style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
               />
               <input
@@ -341,6 +370,7 @@ export default function Home() {
                 value={email}
                 onChange={(e) => {
                   if (typingStartRef.current === null) typingStartRef.current = performance.now();
+                  if (!hasStartedTypingRef.current) hasStartedTypingRef.current = true;
                   setEmail(e.target.value);
                 }}
                 style={{ borderRadius: "6px", padding: "8px", border: "1px solid  #ececec " }}
