@@ -168,6 +168,13 @@ export default function Home() {
     setSubscribers(optimisticList);
     expectedRef.current = optimisticList;
 
+    // Counter here to count AFTER button click
+    if (window.gtag) {
+      window.gtag('set', 'user_properties', {
+        subscriber_count: optimisticList.length,
+      });
+    }    
+
     setName("");
     setEmail("");
 
@@ -232,6 +239,13 @@ export default function Home() {
     setSubscribers(optimisticList);
     expectedRef.current = optimisticList;
 
+    // Counter here to count AFTER button click
+    if (window.gtag) {
+      window.gtag('set', 'user_properties', {
+        subscriber_count: optimisticList.length,
+      });
+    } 
+
     // DELETE with GA error response tracker
     let res;
     try {
@@ -267,13 +281,13 @@ export default function Home() {
     document.documentElement.style.padding = "0";
   }, []);
 
-  useEffect(() => {
-    if (window.gtag) {
-      window.gtag('set', 'user_properties', {
-        subscriber_count: subscribers.length,
-      });
-    }
-  }, [subscribers.length]); // Call when the list length changes
+  // useEffect(() => {
+  //   if (window.gtag) {
+  //     window.gtag('set', 'user_properties', {
+  //       subscriber_count: subscribers.length,
+  //     });
+  //   }
+  // }, [subscribers.length]); // Call when the list length changes
 
   return (
     //BG
